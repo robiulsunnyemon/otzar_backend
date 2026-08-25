@@ -1,0 +1,32 @@
+# Git & IDEs
+.git/
+.gitignore
+.idea/
+.vscode/
+
+# Python Cache & Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Local Environments & Secrets
+.env
+.env.*
+!.env.example
+.venv/
+env/
+venv/
+
+# Build & Testing
+build/
+dist/
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+*.db
+*.sqlite
+*.sqlite3
+*.log
