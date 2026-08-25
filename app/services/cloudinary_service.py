@@ -21,6 +21,12 @@ async def upload_avatar_image(file: UploadFile, user_id: str) -> Optional[str]:
     Upload an avatar image to Cloudinary and return the secure HTTPS URL.
     """
     try:
+        cloudinary.config(
+            cloud_name=settings.CLOUDINARY_CLOUD_NAME,
+            api_key=settings.CLOUDINARY_API_KEY,
+            api_secret=settings.CLOUDINARY_API_SECRET,
+            secure=True,
+        )
         contents = await file.read()
         response = cloudinary.uploader.upload(
             contents,

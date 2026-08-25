@@ -37,6 +37,7 @@ class UserProfileUpdate(BaseModel):
     designation: Optional[str] = None
     company_name: Optional[str] = None
     team_name: Optional[str] = None
+    avatar_url: Optional[str] = None
 
 
 class UserSettingsUpdate(BaseModel):

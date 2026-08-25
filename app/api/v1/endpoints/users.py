@@ -113,7 +113,7 @@ async def upload_avatar(
     session: AsyncSession = Depends(get_session),
 ):
     """Upload new avatar image to Cloudinary and update profile avatar URL."""
-    if not file.content_type.startswith("image/"):
+    if file.content_type and not file.content_type.startswith("image/") and not (file.filename and file.filename.lower().endswith(('.jpg', '.jpeg', '.png', '.webp'))):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Uploaded file must be a valid image.",
