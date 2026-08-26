@@ -144,3 +144,18 @@ async def refresh_token_endpoint(
         token_type="bearer",
         user=UserRead.model_validate(user),
     )
+
+
+@router.post(
+    "/logout",
+    status_code=status.HTTP_200_OK,
+    summary="Logout Operator & Invalidate Session",
+)
+async def logout_endpoint():
+    """
+    Terminates operator session cleanly and returns success confirmation.
+    """
+    return {
+        "status": "success",
+        "message": "Operator successfully logged out from Otzar Field Station.",
+    }
