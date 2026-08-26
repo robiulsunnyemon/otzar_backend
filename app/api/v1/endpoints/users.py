@@ -55,8 +55,21 @@ async def get_current_user(
 )
 async def get_my_profile(
     current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
 ):
     """Retrieve full profile, field metrics, and device settings for current operator."""
+    from app.models.specimen import Specimen
+    stmt = select(Specimen).where(Specimen.user_id == current_user.id)
+    res = await session.execute(stmt)
+    user_specimens = list(res.scalars().all())
+
+    if user_specimens:
+        current_user.scans_count = len(user_specimens)
+        current_user.minerals_count = len(set(s.name.strip().lower() for s in user_specimens if s.name))
+        session.add(current_user)
+        await session.commit()
+        await session.refresh(current_user)
+
     return current_user
 
 

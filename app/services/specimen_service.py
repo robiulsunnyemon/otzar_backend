@@ -64,6 +64,17 @@ class SpecimenService:
                 )
                 db.add(new_specimen)
 
+            synced_receipts.append(item.tag)
+
+        if current_user:
+            # Update user cloud metrics
+            user_scans_stmt = select(Specimen).where(Specimen.user_id == current_user.id)
+            user_scans_res = await db.execute(user_scans_stmt)
+            user_all_specimens = list(user_scans_res.scalars().all())
+            current_user.scans_count = len(user_all_specimens)
+            current_user.minerals_count = len(set(s.name.strip().lower() for s in user_all_specimens if s.name))
+            db.add(current_user)
+
         try:
             await db.commit()
         except Exception as e:
