@@ -24,6 +24,10 @@ class RefreshTokenRequest(BaseModel):
     refresh_token: str = Field(..., description="Valid JWT refresh token")
 
 
+class BiometricVerifyRequest(BaseModel):
+    refresh_token: str = Field(..., description="Secure biometric session token")
+
+
 class TokenResponse(BaseModel):
     access_token: str
     refresh_token: str

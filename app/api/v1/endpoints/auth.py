@@ -6,6 +6,7 @@ from app.schemas.auth import (
     EmailSubmitResponse,
     PinVerifyRequest,
     RefreshTokenRequest,
+    BiometricVerifyRequest,
     TokenResponse,
 )
 from app.schemas.user import UserRead
@@ -137,6 +138,29 @@ async def refresh_token_endpoint(
     session: AsyncSession = Depends(get_session),
 ):
     """Validates the refresh token and issues a fresh pair of access and refresh tokens."""
+    user, access_token, refresh_token = await refresh_user_tokens(session, data.refresh_token)
+    return TokenResponse(
+        access_token=access_token,
+        refresh_token=refresh_token,
+        token_type="bearer",
+        user=UserRead.model_validate(user),
+    )
+
+
+@router.post(
+    "/biometric-verify",
+    response_model=TokenResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Authenticate Operator using On-Device Verified Biometric/Face Token",
+)
+async def biometric_verify_endpoint(
+    data: BiometricVerifyRequest,
+    session: AsyncSession = Depends(get_session),
+):
+    """
+    Validates the secure biometric cryptographic token after on-device Face ID verification
+    and issues fresh access and refresh tokens without requiring manual email/PIN.
+    """
     user, access_token, refresh_token = await refresh_user_tokens(session, data.refresh_token)
     return TokenResponse(
         access_token=access_token,
