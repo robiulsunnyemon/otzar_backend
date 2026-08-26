@@ -98,7 +98,11 @@ class SpecimenService:
         db: AsyncSession,
         limit: int = 100,
         offset: int = 0,
+        user_id: Optional[any] = None,
     ) -> List[Specimen]:
-        statement = select(Specimen).order_by(Specimen.created_at.desc()).offset(offset).limit(limit)
+        statement = select(Specimen)
+        if user_id:
+            statement = statement.where(Specimen.user_id == user_id)
+        statement = statement.order_by(Specimen.created_at.desc()).offset(offset).limit(limit)
         result = await db.execute(statement)
         return list(result.scalars().all())

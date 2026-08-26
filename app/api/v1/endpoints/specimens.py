@@ -74,11 +74,13 @@ async def list_cloud_specimens(
     limit: int = 100,
     offset: int = 0,
     session: AsyncSession = Depends(get_session),
+    current_user: Optional[User] = Depends(get_optional_current_user),
 ):
     specimens = await SpecimenService.list_specimens(
         db=session,
         limit=limit,
         offset=offset,
+        user_id=current_user.id if current_user else None,
     )
 
     response_items = []
