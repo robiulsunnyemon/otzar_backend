@@ -1,7 +1,7 @@
 import json
 import uuid
 from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_session
@@ -13,9 +13,35 @@ from app.schemas.specimen import (
     SpecimenResponse,
 )
 from app.services.specimen_service import SpecimenService
+from app.services.cloudinary_service import upload_specimen_image
 
 router = APIRouter(tags=["Specimens & Sync Engine"])
 security = HTTPBearer(auto_error=False)
+
+
+@router.post(
+    "/specimens/upload-photo",
+    summary="Upload Specimen Field Photo to Cloudinary CDN",
+    description="Uploads a specimen mineral image to Cloudinary and returns the permanent CDN URL.",
+)
+async def upload_field_specimen_photo(
+    file: UploadFile = File(...),
+    tag: str = Form("#SC-001"),
+):
+    if not file.content_type.startswith("image/"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Uploaded file must be an image format (JPEG, PNG, WEBP).",
+        )
+
+    url = await upload_specimen_image(file=file, specimen_tag=tag)
+    if not url:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to upload specimen photo to Cloudinary CDN.",
+        )
+
+    return {"status": "success", "url": url, "tag": tag}
 
 
 async def get_optional_current_user(

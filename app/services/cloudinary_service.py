@@ -44,3 +44,35 @@ async def upload_avatar_image(file: UploadFile, user_id: str) -> Optional[str]:
         logger.error(f"Cloudinary upload failed: {e}")
         # Return fallback mock URL in local development if credentials aren't live yet
         return f"https://res.cloudinary.com/{settings.CLOUDINARY_CLOUD_NAME}/image/upload/v1/otzar_avatars/avatar_{user_id}.png"
+
+
+async def upload_specimen_image(file: UploadFile, specimen_tag: str) -> Optional[str]:
+    """
+    Upload a field specimen mineral photo to Cloudinary CDN and return the permanent secure URL.
+    """
+    try:
+        import uuid
+        cloudinary.config(
+            cloud_name=settings.CLOUDINARY_CLOUD_NAME,
+            api_key=settings.CLOUDINARY_API_KEY,
+            api_secret=settings.CLOUDINARY_API_SECRET,
+            secure=True,
+        )
+        contents = await file.read()
+        clean_tag = specimen_tag.replace("#", "").replace("-", "_").lower()
+        suffix = uuid.uuid4().hex[:6]
+        response = cloudinary.uploader.upload(
+            contents,
+            folder="otzar_specimens",
+            public_id=f"specimen_{clean_tag}_{suffix}",
+            overwrite=True,
+            resource_type="image",
+            transformation=[
+                {"width": 1280, "height": 1280, "crop": "limit"},
+                {"quality": "auto", "fetch_format": "auto"},
+            ],
+        )
+        return response.get("secure_url")
+    except Exception as e:
+        logger.error(f"Cloudinary specimen upload failed: {e}")
+        return None
