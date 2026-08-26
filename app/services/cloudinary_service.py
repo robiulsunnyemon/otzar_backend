@@ -76,3 +76,49 @@ async def upload_specimen_image(file: UploadFile, specimen_tag: str) -> Optional
     except Exception as e:
         logger.error(f"Cloudinary specimen upload failed: {e}")
         return None
+
+
+async def upload_model_raw_asset(
+    file: UploadFile,
+    asset_type: str,
+    version_tag: str,
+) -> Optional[str]:
+    """
+    Upload a Neural Model file (.tflite, .txt labels, .json DB) directly to Cloudinary
+    as a raw resource and return the secure CDN HTTPS URL.
+    """
+    try:
+        import uuid
+        cloudinary.config(
+            cloud_name=settings.CLOUDINARY_CLOUD_NAME,
+            api_key=settings.CLOUDINARY_API_KEY,
+            api_secret=settings.CLOUDINARY_API_SECRET,
+            secure=True,
+        )
+        contents = await file.read()
+        clean_version = version_tag.replace(".", "_").replace("-", "_").lower()
+        suffix = uuid.uuid4().hex[:6]
+        
+        # Determine appropriate filename extension
+        ext = "bin"
+        if file.filename:
+            if file.filename.endswith(".tflite"):
+                ext = "tflite"
+            elif file.filename.endswith(".txt"):
+                ext = "txt"
+            elif file.filename.endswith(".json"):
+                ext = "json"
+
+        public_id = f"otzar_models/{asset_type}_{clean_version}_{suffix}.{ext}"
+
+        response = cloudinary.uploader.upload(
+            contents,
+            folder="otzar_models",
+            public_id=f"{asset_type}_{clean_version}_{suffix}",
+            resource_type="raw",
+            overwrite=True,
+        )
+        return response.get("secure_url")
+    except Exception as e:
+        logger.error(f"Cloudinary model raw asset upload failed for {asset_type}: {e}")
+        return None
