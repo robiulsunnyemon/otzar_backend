@@ -20,9 +20,23 @@ async_session_maker = sessionmaker(
 )
 
 
+from sqlalchemy import text
+
+
 async def init_db() -> None:
     async with engine.begin() as conn:
         await conn.run_sync(SQLModel.metadata.create_all)
+
+        # Ensure newly added columns exist in PostgreSQL database
+        migrations = [
+            "ALTER TABLE specimens ADD COLUMN IF NOT EXISTS city VARCHAR;",
+            "ALTER TABLE specimens ADD COLUMN IF NOT EXISTS country VARCHAR;",
+        ]
+        for sql in migrations:
+            try:
+                await conn.execute(text(sql))
+            except Exception:
+                pass
 
 
 async def get_session() -> AsyncGenerator[AsyncSession, None]:
