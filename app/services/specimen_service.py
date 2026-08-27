@@ -37,6 +37,8 @@ class SpecimenService:
                 existing_specimen.latitude = item.lat or existing_specimen.latitude
                 existing_specimen.longitude = item.lon or existing_specimen.longitude
                 existing_specimen.altitude = item.altitude or existing_specimen.altitude
+                existing_specimen.city = item.city or existing_specimen.city
+                existing_specimen.country = item.country or existing_specimen.country
                 existing_specimen.field_notes = item.notes or existing_specimen.field_notes
                 existing_specimen.photos = photos_json
                 existing_specimen.has_voice_note = item.hasVoiceNote or False
@@ -55,6 +57,8 @@ class SpecimenService:
                     latitude=item.lat,
                     longitude=item.lon,
                     altitude=item.altitude,
+                    city=item.city,
+                    country=item.country,
                     field_notes=item.notes,
                     photos=photos_json,
                     has_voice_note=item.hasVoiceNote or False,

@@ -39,7 +39,7 @@ class Specimen(UUIDModel, TimestampModel, table=True):
         description="Geological deposit or claim sector name",
     )
 
-    # GPS Telemetry
+    # GPS Telemetry & Geocoding
     latitude: Optional[str] = Field(
         default=None,
         nullable=True,
@@ -54,6 +54,16 @@ class Specimen(UUIDModel, TimestampModel, table=True):
         default=None,
         nullable=True,
         description="Elevation / Altitude above sea level",
+    )
+    city: Optional[str] = Field(
+        default=None,
+        nullable=True,
+        description="City or locality name of discovery",
+    )
+    country: Optional[str] = Field(
+        default=None,
+        nullable=True,
+        description="Country name of discovery",
     )
 
     # Field Observations & Multi-Modal Media

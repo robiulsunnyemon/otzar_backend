@@ -19,6 +19,8 @@ class SpecimenCreate(BaseModel):
     lat: Optional[str] = Field(None, description="Latitude")
     lon: Optional[str] = Field(None, description="Longitude")
     altitude: Optional[str] = Field(None, description="Altitude ASL")
+    city: Optional[str] = Field(None, description="City or locality name")
+    country: Optional[str] = Field(None, description="Country name")
     timestamp: Optional[str] = Field(None, description="Timestamp ISO string")
 
 
@@ -39,6 +41,8 @@ class SpecimenResponse(BaseModel):
     latitude: Optional[str] = None
     longitude: Optional[str] = None
     altitude: Optional[str] = None
+    city: Optional[str] = None
+    country: Optional[str] = None
     field_notes: Optional[str] = None
     photos: Optional[List[str]] = None
     has_voice_note: bool = False
